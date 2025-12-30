@@ -5,7 +5,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 
 # Avoid duplicate find_package()
 set(_ossl_expected_targets OpenSSL::Crypto OpenSSL::SSL
-    OpenSSL::applink)
+    )
 set(_ossl_defined_targets)
 set(_ossl_undefined_targets)
 foreach(t IN LISTS _ossl_expected_targets)
@@ -75,8 +75,6 @@ set(OPENSSL_ENGINES_DIR "${_ossl_prefix}//engines")
 set(OPENSSL_MODULES_DIR "${_ossl_prefix}//providers")
 set(OPENSSL_RUNTIME_DIR "${_ossl_prefix}/apps")
 
-set(OPENSSL_APPLINK_SOURCE "${_ossl_prefix}/ms/applink.c")
-
 set(OPENSSL_PROGRAM "${OPENSSL_RUNTIME_DIR}/openssl.exe")
 
 # Set up the imported targets
@@ -85,7 +83,7 @@ if(_ossl_use_static_libs)
   add_library(OpenSSL::Crypto STATIC IMPORTED)
   add_library(OpenSSL::SSL STATIC IMPORTED)
 
-  set(OPENSSL_LIBCRYPTO_STATIC "${OPENSSL_LIBRARY_DIR}/libcrypto_static.lib")
+  set(OPENSSL_LIBCRYPTO_STATIC "${OPENSSL_LIBRARY_DIR}/libcrypto.a")
   set(OPENSSL_LIBCRYPTO_DEPENDENCIES ws2_32.lib gdi32.lib advapi32.lib crypt32.lib user32.lib)
   set_target_properties(OpenSSL::Crypto PROPERTIES
     IMPORTED_LINK_INTERFACE_LANGUAGES "C"
@@ -93,7 +91,7 @@ if(_ossl_use_static_libs)
   set_property(TARGET OpenSSL::Crypto
     PROPERTY INTERFACE_LINK_LIBRARIES ${OPENSSL_LIBCRYPTO_DEPENDENCIES})
 
-  set(OPENSSL_LIBSSL_STATIC "${OPENSSL_LIBRARY_DIR}/libssl_static.lib")
+  set(OPENSSL_LIBSSL_STATIC "${OPENSSL_LIBRARY_DIR}/libssl.a")
   set(OPENSSL_LIBSSL_DEPENDENCIES OpenSSL::Crypto)
   set_target_properties(OpenSSL::SSL PROPERTIES
     IMPORTED_LINK_INTERFACE_LANGUAGES "C"
@@ -114,7 +112,7 @@ else()
   add_library(OpenSSL::SSL SHARED IMPORTED)
 
   set(OPENSSL_LIBCRYPTO_SHARED "${OPENSSL_RUNTIME_DIR}/libcrypto-3-x64.dll")
-  set(OPENSSL_LIBCRYPTO_IMPORT "${OPENSSL_LIBRARY_DIR}/libcrypto.lib")
+  set(OPENSSL_LIBCRYPTO_IMPORT "${OPENSSL_LIBRARY_DIR}/libcrypto.dll.a")
   set(OPENSSL_LIBCRYPTO_DEPENDENCIES )
   set_target_properties(OpenSSL::Crypto PROPERTIES
     IMPORTED_LINK_INTERFACE_LANGUAGES "C"
@@ -124,7 +122,7 @@ else()
     PROPERTY INTERFACE_LINK_LIBRARIES ${OPENSSL_LIBCRYPTO_DEPENDENCIES})
 
   set(OPENSSL_LIBSSL_SHARED "${OPENSSL_RUNTIME_DIR}/libssl-3-x64.dll")
-  set(OPENSSL_LIBSSL_IMPORT "${OPENSSL_LIBRARY_DIR}/libssl.lib")
+  set(OPENSSL_LIBSSL_IMPORT "${OPENSSL_LIBRARY_DIR}/libssl.dll.a")
   set(OPENSSL_LIBSSL_DEPENDENCIES OpenSSL::Crypto )
   set_target_properties(OpenSSL::SSL PROPERTIES
     IMPORTED_LINK_INTERFACE_LANGUAGES "C"
@@ -148,10 +146,6 @@ set_target_properties(OpenSSL::Crypto PROPERTIES
 set_target_properties(OpenSSL::SSL PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${OPENSSL_INCLUDE_DIR}")
 
-
-add_library(OpenSSL::applink INTERFACE IMPORTED)
-set_property(TARGET OpenSSL::applink PROPERTY
-  INTERFACE_SOURCES "${OPENSSL_APPLINK_SOURCE}")
 
 
 unset(_ossl_prefix)
